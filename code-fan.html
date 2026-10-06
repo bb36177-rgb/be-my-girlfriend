@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>มีเรื่องอยากบอกเธอ 💌</title>
+<meta property="og:title" content="มีเรื่องอยากบอกเธอ 💌">
+<meta property="og:description" content="เปิดดูหน่อยนะ มีอะไรอยากถามเธอ">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#ffe3ec;--bg2:#ffc2d6;--ink:#7a1f45;--card:rgba(255,255,255,.75);--pink:#ff4d88;--pink2:#ff8fb3}
+@media (prefers-color-scheme:dark){:root{--bg1:#3a1428;--bg2:#5c1d3f;--ink:#ffd6e6;--card:rgba(40,12,28,.7)}}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:'Mali','Sarabun',system-ui,sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2));overflow:hidden;
+padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+#hearts{position:fixed;inset:0;pointer-events:none;z-index:0}
+.heart{position:absolute;bottom:-40px;animation:rise linear forwards;opacity:.8}
+@keyframes rise{to{transform:translateY(-110vh) rotate(25deg);opacity:0}}
+main{position:relative;z-index:1;height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:var(--card);backdrop-filter:blur(10px);border-radius:32px;padding:34px 26px;max-width:440px;width:100%;text-align:center;
+box-shadow:0 20px 60px rgba(255,77,136,.3);border:2px solid rgba(255,255,255,.6);animation:pop .7s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.emoji{font-size:84px;line-height:1;animation:beat 1.3s infinite;display:block;margin-bottom:10px}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.12)}}
+h1{font-size:clamp(24px,6vw,32px);line-height:1.35;margin-bottom:8px}
+p.sub{opacity:.85;margin-bottom:26px;min-height:1.6em}
+.btns{position:relative;height:120px;display:flex;justify-content:center;align-items:flex-start;gap:16px}
+button{font-family:inherit;font-weight:700;border:0;border-radius:999px;cursor:pointer;padding:14px 30px;font-size:18px;transition:transform .2s}
+#yes{background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;box-shadow:0 8px 20px rgba(255,77,136,.45);font-size:var(--yes,18px)}
+#yes:hover{transform:scale(1.07)}
+#no{background:#fff;color:#999;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+#no.run{position:fixed;z-index:5}
+.hidden{display:none!important}
+#done .emoji{font-size:96px}
+.note{margin-top:18px;font-size:15px;opacity:.9;line-height:1.7}
+.confetti{position:fixed;top:-20px;z-index:10;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+footer{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:100%;text-align:center;font-size:12px;opacity:.6;z-index:1}
+</style>
+</head>
+<body>
+<div id="hearts"></div>
+<main>
+  <section class="card" id="ask">
+    <span class="emoji" id="face">🥺</span>
+    <h1 id="title">เธอคนเก่ง… มีเรื่องอยากถามอะไรหน่อย</h1>
+    <p class="sub" id="sub">ตั้งใจฟังนะ มันสำคัญมากๆ เลย 💭</p>
+    <div class="btns" id="btns">
+      <button id="yes">ตกลง 💖</button>
+      <button id="no">ไม่ 😢</button>
+    </div>
+  </section>
+
+  <section class="card hidden" id="done">
+    <span class="emoji">🥰</span>
+    <h1>ขอบคุณที่ตอบตกลงนะ!</h1>
+    <p class="note" id="msg"></p>
+    <p class="note">จากนี้ไปขอดูแลกันและกันให้ดีที่สุดนะ 💕</p>
+  </section>
+</main>
+<footer>made with 💗</footer>
+
+<script>
+/* ===== แก้ตรงนี้ได้เลย ===== */
+const HER_NAME = "เธอ";          // ชื่อเล่นแฟนของคุณ
+const MY_NAME  = "ฉัน";          // ชื่อของคุณ
+const FINAL_MESSAGE = `${MY_NAME} ชอบ${HER_NAME}มากๆ เลยนะ อยากอยู่ข้างๆ ในทุกวัน ทั้งวันที่ดีและวันที่เหนื่อย — เป็นแฟนกับ${MY_NAME}นะ`;
+/* ========================= */
+
+const noTexts = ["ไม่ 😢","แน่ใจเหรอ? 🥺","คิดดูอีกที…","ใจร้ายอ่ะ 😭","ขอร้องล่ะ 🙏","ไม่เอาน้า~","ลองกดอีกปุ่มสิ 💖","กดไม่โดนหรอก 😝"];
+const subs = ["ตั้งใจฟังนะ มันสำคัญมากๆ เลย 💭","อย่าเพิ่งใจร้ายสิ…","เสียใจนะเนี่ย 🥲","ปุ่มนั้นมันเสียแล้วล่ะ 😆","กดปุ่มชมพูเถอะนะ 🥹"];
+const faces = ["🥺","😢","😭","🥹","😤"];
+const $ = id => document.getElementById(id);
+const title = $("title"), sub = $("sub"), face = $("face"), yes = $("yes"), no = $("no");
+title.textContent = `${HER_NAME}คะ… มีเรื่องอยากถามอะไรหน่อย`;
+title.textContent = title.textContent.replace("คะ…","… ");
+title.textContent = `${HER_NAME} เป็นแฟนกับ${MY_NAME}นะ? 💍`;
+
+let tries = 0, yesSize = 18;
+
+function runAway(){
+  tries++;
+  no.textContent = noTexts[Math.min(tries, noTexts.length-1)];
+  sub.textContent = subs[Math.min(tries-1, subs.length-1)];
+  face.textContent = faces[Math.min(tries-1, faces.length-1)];
+  yesSize = Math.min(yesSize + 5, 44);
+  yes.style.setProperty("--yes", yesSize + "px");
+  no.classList.add("run");
+  const w = no.offsetWidth, h = no.offsetHeight;
+  const x = Math.random() * (innerWidth - w - 20) + 10;
+  const y = Math.random() * (innerHeight - h - 60) + 10;
+  no.style.left = x + "px"; no.style.top = y + "px";
+}
+no.addEventListener("mouseenter", runAway);
+no.addEventListener("touchstart", e => { e.preventDefault(); runAway(); }, {passive:false});
+no.addEventListener("click", runAway);
+
+function confetti(){
+  const items = ["💖","💗","💕","🌸","✨","🎉","🌹"];
+  for(let i=0;i<90;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.textContent = items[Math.floor(Math.random()*items.length)];
+    c.style.left = Math.random()*100 + "vw";
+    c.style.fontSize = (16 + Math.random()*22) + "px";
+    c.style.animationDuration = (2.5 + Math.random()*3) + "s";
+    c.style.animationDelay = Math.random()*1.2 + "s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 8000);
+  }
+}
+yes.addEventListener("click", () => {
+  $("ask").classList.add("hidden");
+  no.classList.add("hidden");
+  $("done").classList.remove("hidden");
+  $("msg").textContent = FINAL_MESSAGE;
+  confetti(); setTimeout(confetti, 1500); setTimeout(confetti, 3200);
+});
+
+/* หัวใจลอยพื้นหลัง */
+const box = $("hearts"), hs = ["💗","💖","💕","🌸","💘"];
+function spawn(){
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.textContent = hs[Math.floor(Math.random()*hs.length)];
+  h.style.left = Math.random()*100 + "vw";
+  h.style.fontSize = (14 + Math.random()*26) + "px";
+  h.style.animationDuration = (6 + Math.random()*6) + "s";
+  box.appendChild(h);
+  setTimeout(()=>h.remove(), 12500);
+}
+setInterval(spawn, 450);
+</script>
+</body>
+</html>
